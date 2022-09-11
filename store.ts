@@ -1,7 +1,47 @@
 import {
     Collection,
+    Database,
     ObjectId,
-  } from "https://deno.land/x/mongo@v0.31.1/mod.ts";
+    UpdateFilter,
+} from "https://deno.land/x/mongo@v0.31.1/mod.ts";
+
+type Query = any;
+
+type Single<T> = T | undefined;
+
+class Store<T> {
+    private db: Database;
+    public collection: Collection<T>;
+
+    constructor(db: Database, collectionName: string) {
+        this.db = db;
+        this.collection = this.db.collection(collectionName);
+    }
+
+    async find(query: Query): Promise<Array<T>> {
+        return await this.collection.find(query).toArray();
+    }
+
+    async get(id: ObjectId): Promise<Single<T>> {
+        return await this.collection.findOne({ _id: id });
+    }
+
+    async create(data: T): Promise<Single<T>> {
+        const result = await this.collection.insertOne(data);
+        return await this.collection.findOne({ _id: result });
+    }
+
+    async update(id: ObjectId, update: UpdateFilter<T>): Promise<Single<T>> {
+        await this.collection.updateOne({ _id: id }, update);
+        return await this.collection.findOne({ _id: id });
+    }
+
+    async remove(id: ObjectId): Promise<Single<T>> {
+        const result = await this.collection.findOne({ _id: id });
+        await this.collection.deleteOne({ _id: id });
+        return result;
+    }    
+}
 
 export type MealId = ObjectId;
 
@@ -12,36 +52,21 @@ export type Meal = {
     happiness: number;
 }
 
+export type MealQuery = {
+    _id?: MealId;
+    name?: string;
+    rating?: number;
+    happiness?: number;
+};
+
 export type SingleMeal = Meal | undefined;
 
-export class MealStore {
-  private collection: Collection<Meal>;
+export class MealStore<Meal> extends Store<Meal> {
+    constructor(db: Database, collectionName: string = "meals") {
+        super(db, collectionName);
+    }
+}
 
-  constructor(collection: Collection<Meal>) {
-    this.collection = collection;
-  }
-
-  async find(query: QueuingStrategy): Promise<Array<Meal>> {
-    return await this.collection.find(query).toArray();
-  }
-
-  async get(id: MealId): Promise<SingleMeal> {
-    return await this.collection.findOne({ _id: id });
-  }
-
-  async create(data: Meal): Promise<SingleMeal> {
-    const meal = await this.collection.insertOne(data);
-    return await this.collection.findOne({ _id: meal });
-  }
-
-  async update(id: MealId, data: Meal): Promise<SingleMeal> {
-    await this.collection.updateOne({ _id: id }, { $set: data });
-    return await this.collection.findOne({ _id: id });
-  }
-
-  async remove(id: MealId): Promise<SingleMeal> {
-    const meal = await this.collection.findOne({ _id: id });
-    await this.collection.deleteOne({ _id: id });
-    return meal;
-  }
+export function createMealStore(db: Database): MealStore<Meal> {
+    return new MealStore(db);
 }
