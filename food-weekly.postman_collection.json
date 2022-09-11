@@ -39,7 +39,10 @@
 					"listen": "test",
 					"script": {
 						"exec": [
-							"pm.response.to.have.status(200);"
+							"pm.response.to.have.status(200);\r",
+							"const body = JSON.parse(pm.response.text());\r",
+							"pm.environment.set(\"mealId\", body.data);\r",
+							"console.log(body);"
 						],
 						"type": "text/javascript"
 					}
@@ -118,7 +121,7 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://localhost:8000/meal/1",
+					"raw": "http://localhost:8000/meal/{{mealId}}",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -126,7 +129,7 @@
 					"port": "8000",
 					"path": [
 						"meal",
-						"1"
+						"{{mealId}}"
 					]
 				}
 			},
@@ -151,6 +154,12 @@
 					""
 				]
 			}
+		}
+	],
+	"variable": [
+		{
+			"key": "mealId",
+			"value": ""
 		}
 	]
 }
