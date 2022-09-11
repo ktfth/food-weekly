@@ -1,5 +1,6 @@
 import { Application, Router } from "https://deno.land/x/oak@v11.1.0/mod.ts";
 import {
+Collection,
   MongoClient,
   ObjectId,
 } from "https://deno.land/x/mongo@v0.31.1/mod.ts";
@@ -17,6 +18,40 @@ type Meal = {
     happiness: number;
 }
 
+type SingleMeal = Meal | undefined;
+
+class MealStore {
+  private collection: Collection<Meal>;
+
+  constructor(collection: Collection<Meal>) {
+    this.collection = collection;
+  }
+
+  async find(query: QueuingStrategy): Promise<Array<Meal>> {
+    return await this.collection.find(query).toArray();
+  }
+
+  async get(id: MealId): Promise<SingleMeal> {
+    return await this.collection.findOne({ _id: id });
+  }
+
+  async create(data: Meal): Promise<SingleMeal> {
+    const meal = await this.collection.insertOne(data);
+    return await this.collection.findOne({ _id: meal });
+  }
+
+  async update(id: MealId, data: Meal): Promise<SingleMeal> {
+    await this.collection.updateOne({ _id: id }, { $set: data });
+    return await this.collection.findOne({ _id: id });
+  }
+
+  async remove(id: MealId): Promise<SingleMeal> {
+    const meal = await this.collection.findOne({ _id: id });
+    await this.collection.deleteOne({ _id: id });
+    return meal;
+  }
+}
+
 const router = new Router();
 router
   .get("/", (context) => {
@@ -26,8 +61,8 @@ router
     const body = context.request.body();
     const mealData = await body.value;
     const meals = db.collection<Meal>("meals");
-    const _mealCreated = await meals.insertOne(mealData);
-    const meal = await meals.findOne({ _id: _mealCreated });
+    const mealStore = new MealStore(meals);
+    const meal = await mealStore.create(mealData);
     context.response.body = {
       success: true,
       data: meal,
@@ -35,15 +70,17 @@ router
   })
   .get("/meals", async (context) => {
     const meals = db.collection<Meal>("meals");
+    const mealStore = new MealStore(meals);
     context.response.body = {
       success: true,
-      data: await meals.find({}).toArray(),
+      data: await mealStore.find({}),
     };
   })
   .get("/meal/:id", async (context) => {
     const mealId: MealId = new ObjectId(context?.params?.id);
     const meals = db.collection<Meal>("meals");
-    const meal = await meals.findOne({ _id: mealId });
+    const mealStore = new MealStore(meals);
+    const meal = await mealStore.get(mealId);
     context.response.body = {
       success: true,
       data: meal,
@@ -54,8 +91,8 @@ router
     const mealId: MealId = new ObjectId(context?.params?.id);
     const mealData = await body.value;
     const meals = db.collection<Meal>("meals");
-    const _mealUpdated = await meals.updateOne({ _id: mealId }, { $set: mealData });
-    const meal = await meals.findOne({ _id: mealId });
+    const mealStore = new MealStore(meals);
+    const meal = await mealStore.update(mealId, mealData);
     context.response.body = {
       success: true,
       data: meal,
@@ -66,8 +103,8 @@ router
     const mealId: MealId = new ObjectId(context?.params?.id);
     const mealData = await body.value;
     const meals = db.collection<Meal>("meals");
-    const _mealUpdated = await meals.updateOne({ _id: mealId }, { $set: mealData });
-    const meal = await meals.findOne({ _id: mealId });
+    const mealStore = new MealStore(meals);
+    const meal = await mealStore.update(mealId, mealData);
     context.response.body = {
       success: true,
       data: meal,
@@ -76,9 +113,11 @@ router
   .delete("/meal/:id", async (context) => {
     const mealId: MealId = new ObjectId(context?.params?.id);
     const meals = db.collection<Meal>("meals");
-    const mealDeleted = await meals.deleteOne({ _id: mealId });
+    const mealStore = new MealStore(meals);
+    const meal = await mealStore.remove(mealId);
     context.response.body = {
-      success: mealDeleted ? true : false,
+      success: meal ? true : false,
+      data: meal,
     };
   });
 
