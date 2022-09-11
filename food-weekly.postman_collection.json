@@ -41,8 +41,7 @@
 						"exec": [
 							"pm.response.to.have.status(200);\r",
 							"const body = JSON.parse(pm.response.text());\r",
-							"pm.environment.set(\"mealId\", body.data);\r",
-							"console.log(body);"
+							"pm.environment.set(\"mealId\", body.data._id);"
 						],
 						"type": "text/javascript"
 					}
@@ -119,6 +118,117 @@
 			],
 			"request": {
 				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8000/meal/{{mealId}}",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"meal",
+						"{{mealId}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update a fragment of meal",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.response.to.have.status(200);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PATCH",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"name\": \"Miojo\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8000/meal/{{mealId}}",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"meal",
+						"{{mealId}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update all the document of meal",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.response.to.have.status(200);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"name\": \"Talharim\",\r\n    \"rating\": 3,\r\n    \"happiness\": 5,\r\n    \"comment\": \"Prático\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8000/meal/{{mealId}}",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"meal",
+						"{{mealId}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete a meal",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.response.to.have.status(200);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
 				"header": [],
 				"url": {
 					"raw": "http://localhost:8000/meal/{{mealId}}",
