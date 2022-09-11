@@ -10,7 +10,7 @@ and others.
 ## Run
 
 ```
-deno run --allow-net app.ts
+deno run --allow-net --allow-write --allow-read app.ts
 ```
 
 ## Test
