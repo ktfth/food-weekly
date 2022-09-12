@@ -12,7 +12,7 @@
 					"listen": "test",
 					"script": {
 						"exec": [
-							"pm.response.to.have.body(\"Hello from Food Weekly!\");"
+							"pm.response.to.have.body({ success: true, message: \"Hello from Food Weekly!\" });"
 						],
 						"type": "text/javascript"
 					}
