@@ -1,6 +1,7 @@
 import {
     Collection,
     Database,
+    InsertDocument,
     ObjectId,
     UpdateFilter,
 } from "https://deno.land/x/mongo@v0.31.1/mod.ts";
@@ -31,8 +32,13 @@ class Store<T> {
         return await this.collection.findOne({ _id: result });
     }
 
-    async update(id: ObjectId, update: UpdateFilter<T>): Promise<Single<T>> {
-        await this.collection.updateOne({ _id: id }, update);
+    async patch(id: ObjectId, patch: UpdateFilter<T>): Promise<Single<T>> {
+        await this.collection.updateOne({ _id: id }, patch);
+        return await this.collection.findOne({ _id: id });
+    }
+
+    async update(id: ObjectId, update: InsertDocument<T>): Promise<Single<T>> {
+        await this.collection.replaceOne({ _id: id }, update);
         return await this.collection.findOne({ _id: id });
     }
 

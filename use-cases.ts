@@ -36,11 +36,22 @@ export async function getMeal(context: any) {
     };
 }
 
+export async function patchMeal(context: any) {
+    const body = context.request.body();
+    const mealId: MealId = new ObjectId(context?.params?.id);
+    const mealData: Meal = await body.value;
+    const meal: SingleMeal = await context.app.state.mealStore.patch(mealId, { $set: mealData });
+    return {
+        success: true,
+        data: meal,
+    };
+}
+
 export async function updateMeal(context: any) {
     const body = context.request.body();
     const mealId: MealId = new ObjectId(context?.params?.id);
     const mealData: Meal = await body.value;
-    const meal: SingleMeal = await context.app.state.mealStore.update(mealId, { $set: mealData });
+    const meal: SingleMeal = await context.app.state.mealStore.update(mealId, mealData);
     return {
         success: true,
         data: meal,

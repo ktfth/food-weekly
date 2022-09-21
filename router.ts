@@ -25,7 +25,7 @@ export function setupRouter(db: Database) {
             context.response.body = await mediator.notify({...context}, "getMeal");
         })
         .patch("/meal/:id", async (context) => {
-            context.response.body = await mediator.notify({...context}, "updateMeal");
+            context.response.body = await mediator.notify({...context}, "patchMeal");
         })
         .put("/meal/:id", async (context) => {
             context.response.body = await mediator.notify({...context}, "updateMeal");

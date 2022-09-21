@@ -6,6 +6,7 @@ import { FindMealsComponent } from "./services/find-meals.class.ts";
 import { GetMealComponent } from "./services/get-meal.class.ts";
 import { UpdateMealComponent } from "./services/update-meal.class.ts";
 import { RemoveMealComponent } from "./services/remove-meal.class.ts";
+import { PatchMealComponent } from "./services/patch-meal.class.ts";
 
 export const mediator = new ConcreteMediator();
 
@@ -13,5 +14,6 @@ mediator.register(new HealthComponent(mediator));
 mediator.register(new CreateMealComponent(mediator));
 mediator.register(new FindMealsComponent(mediator));
 mediator.register(new GetMealComponent(mediator));
+mediator.register(new PatchMealComponent(mediator));
 mediator.register(new UpdateMealComponent(mediator));
 mediator.register(new RemoveMealComponent(mediator));
