@@ -1,23 +1,7 @@
 import { Router } from "https://deno.land/x/oak@v11.1.0/mod.ts";
 import { Database } from "https://deno.land/x/mongo@v0.31.1/mod.ts";
 import { MealStore, Meal, createMealStore } from "./store.ts";
-import { ConcreteMediator } from "./mediator.ts";
-// Services for registration
-import { HealthComponent } from "./services/health.class.ts";
-import { CreateMealComponent } from "./services/create-meal.class.ts";
-import { FindMealsComponent } from "./services/find-meals.class.ts";
-import { GetMealComponent } from "./services/get-meal.class.ts";
-import { UpdateMealComponent } from "./services/update-meal.class.ts";
-import { RemoveMealComponent } from "./services/remove-meal.class.ts";
-
-const mediator = new ConcreteMediator();
-
-mediator.register(new HealthComponent(mediator));
-mediator.register(new CreateMealComponent(mediator));
-mediator.register(new FindMealsComponent(mediator));
-mediator.register(new GetMealComponent(mediator));
-mediator.register(new UpdateMealComponent(mediator));
-mediator.register(new RemoveMealComponent(mediator));
+import { mediator } from "./services-registration.ts";
 
 export function setupRouter(db: Database) {
     const router = new Router();
